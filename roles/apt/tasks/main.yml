@@ -32,8 +32,15 @@
     purge: yes
     autoremove: yes
 
-- name: "Upgrade the system"
+- name: 'Upgrade the system'
   apt:
     update_cache: yes
     upgrade: dist
+
+- name: 'Install a few packages'
+  apt:
+    name:
+      - 'htop'
+      - 'tree'
+    state: present
 ...
