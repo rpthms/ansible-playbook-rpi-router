@@ -9,6 +9,8 @@ The Pi will be using a read only rootfs with a tmpfs writeable layer on top of
 it using overlayfs. This should help the Pi be much more resistant against SD
 card / USB drive corruption issues.
 
+This playbook only works with Raspberry Pi OS.
+
 Need to set the following variables in vars.yml:
 
 | Variable | Description |
@@ -31,7 +33,7 @@ configure the Pi to use overlayfs as the root filesystem
 Install `ansible` and `git` on your Pi by running:
 
 ```
-sudo apt-get install --no-install-recommends --no-install-suggests ansible git
+apt-get install --no-install-recommends --no-install-suggests ansible git
 ```
 
 Then download this playbook using git-clone:
