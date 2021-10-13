@@ -1,0 +1,47 @@
+---
+# Set up systemd-resolved
+
+- name: 'Ensure resolved.conf.d exists'
+  file:
+    path: '/etc/systemd/resolved.conf.d'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: 'Configure systemd-resolved'
+  copy:
+    src: 'resolved-override.conf'
+    dest: '/etc/systemd/resolved.conf.d/override.conf'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 'Start systemd-resolved'
+  systemd:
+    name: 'systemd-resolved'
+    state: started
+    enabled: yes
+
+- name: 'Install the systemd NSS modules'
+  apt:
+    name: ['libnss-resolve', 'libnss-myhostname']
+    state: present
+
+- name: 'Check if /etc/resolv.conf exists'
+  stat:
+    path: '/etc/resolv.conf'
+  register: resolv_conf
+
+- name: 'Delete /etc/resolv.conf if it is a regular file'
+  shell: 'rm -v /etc/resolv.conf'
+  when: resolv_conf.stat.isreg
+
+- name: 'Symlink /etc/resolv.conf to the systemd-resolved stub-resolver'
+  file:
+    src: '/run/systemd/resolve/stub-resolv.conf'
+    dest: '/etc/resolv.conf'
+    state: link
+    owner: root
+    group: root
+...

@@ -1,0 +1,37 @@
+---
+# Install required packages on the host
+
+- name: 'Copy apt.conf.d/99local'
+  copy:
+    src: '99local'
+    dest: '/etc/apt/apt.conf.d/99local'
+    owner: root
+    group: root
+
+- name: 'Remove unneeded RaspberryPi OS packages'
+  apt:
+    name:
+      - 'avahi-daemon'
+      - 'bluez'
+      - 'triggerhappy'
+      - 'rsyslog'
+      - 'console-setup'
+      - 'nfs-common'
+      - 'rpi-eeprom'
+      - 'rsync'
+      - 'raspberrypi-net-mods'
+      - 'ifupdown'
+      - 'openresolv'
+      - 'logrotate'
+      - 'man-db'
+      - 'dphys-swapfile'
+      - 'fake-hwclock'
+    state: absent
+    purge: yes
+    autoremove: yes
+
+- name: "Upgrade the system"
+  apt:
+    update_cache: yes
+    upgrade: dist
+...

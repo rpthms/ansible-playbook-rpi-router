@@ -1,0 +1,123 @@
+---
+# System level configurations that don't really need
+# a role of their own
+
+- name: 'Ensure /etc/sudoers.d exists'
+  file:
+    path: '/etc/sudoers.d'
+    state: directory
+    owner: root
+    group: root
+
+- name: 'Grant root access to all users in the sudo group'
+  copy:
+    content: '%sudo ALL=(ALL:ALL) ALL'
+    dest: '/etc/sudoers.d/sudoers'
+    mode: 0440
+    owner: root
+    group: root
+    validate: '/usr/sbin/visudo -csf %s'
+
+- name: 'Set the timezone'
+  file:
+    src: '/usr/share/zoneinfo/{{ time_zone_file }}'
+    dest: '/etc/localtime'
+    state: link
+    owner: root
+    group: root
+
+- name: 'Add en_US.UTF-8 to /etc/locale.gen'
+  lineinfile:
+    path: '/etc/locale.gen'
+    line: 'en_US.UTF-8 UTF-8'
+
+- name: 'Run locale-gen'
+  command: 'locale-gen'
+  changed_when: false
+
+- name: 'Add LANG=en_US.UTF-8 to /etc/locale.conf'
+  copy:
+    dest: '/etc/locale.conf'
+    content: 'LANG=en_US.UTF-8'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 'Setting the hostname in /etc/hostname'
+  copy:
+    content: '{{ host_name }}'
+    dest: '/etc/hostname'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 'Set the hostname using hostnamectl'
+  command:
+    cmd: 'hostnamectl set-hostname {{ host_name }}'
+  changed_when: false
+
+- name: 'Adding hostname to /etc/hosts'
+  lineinfile:
+    path: '/etc/hosts'
+    line: '127.1.1.1 {{ host_name }}.{{ host_domain }} {{ host_name }}'
+    state: present
+
+- name: 'Disable SSH password authentication'
+  lineinfile:
+    path: '/etc/ssh/sshd_config'
+    regex: '^(\#|\s)*PasswordAuthentication\s*(yes|no)$'
+    line: 'PasswordAuthentication no'
+
+- name: 'Ensure journald.conf.d exists'
+  file:
+    path: '/etc/systemd/journald.conf.d'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: 'Configure systemd-journald'
+  copy:
+    src: 'journal-override.conf'
+    dest: '/etc/systemd/journald.conf.d/override.conf'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 'Disable unnecessary systemd services'
+  systemd:
+    name: '{{ item }}'
+    state: stopped
+    enabled: no
+  loop:
+    - 'cron.service'
+    - 'sshswitch.service'
+    - 'rpi-display-backlight.service'
+    - 'apt-daily.timer'
+    - 'apt-daily-upgrade.timer'
+    - 'remote-fs.target'
+
+- name: 'Enable required systemd services'
+  systemd:
+    name: '{{ item }}'
+    state: started
+    enabled: yes
+  loop:
+    - 'ssh.service'
+    - 'systemd-timesyncd.service'
+
+- name: 'Disable bluetooth in /boot/config.txt'
+  lineinfile:
+    path: '/boot/config.txt'
+    line: 'dtoverlay=disable-bt'
+
+- name: 'Add a few variables in /boot/config.txt for my Pi HDMI display'
+  lineinfile:
+    path: '/boot/config.txt'
+    line: '{{ item }}'
+  loop:
+    - 'hdmi_group=2'
+    - 'hdmi_mode=87'
+    - 'hdmi_cvt=800 480 60 6 0 0 0'
+    - 'hdmi_drive=1'
+...

@@ -1,0 +1,23 @@
+---
+# Main user configurations
+
+- name: 'Add user {{ user_name }}'
+  user:
+    name: '{{ user_name }}'
+    password: '{{ user_password_hash }}'
+    shell: '/bin/bash'
+    comment: '{{ user_comment }}'
+    groups: ['sudo', 'systemd-journal', 'adm']
+    state: present
+
+- name: 'Setup authorized_keys for {{ user_name }}'
+  authorized_key:
+    user: '{{ user_name }}'
+    key: '{{ user_ssh_key }}'
+    state: present
+
+- name: 'Lock the pi user'
+  user:
+    name: 'pi'
+    password_lock: 'yes'
+...

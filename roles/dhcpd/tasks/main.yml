@@ -1,0 +1,22 @@
+---
+# Configure a DHCP server
+
+- name: 'Install isc-dhcp-server'
+  apt: {name: 'isc-dhcp-server', state: present}
+
+- name: 'Copy dhcpd.conf'
+  copy:
+    src: 'dhcpd.conf'
+    dest: '/etc/dhcp/dhcpd.conf'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: 'Copy default/isc-dhcp-server'
+  copy:
+    src: 'default-isc-dhcp-server'
+    dest: '/etc/default/isc-dhcp-server'
+    owner: root
+    group: root
+    mode: '0644'
+...

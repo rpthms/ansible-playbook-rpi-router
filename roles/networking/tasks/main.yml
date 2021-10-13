@@ -1,0 +1,66 @@
+---
+# Role to set up networking
+
+- name: 'Configure the .network file for wlan0'
+  copy:
+    src: 'wlan0.network'
+    dest: '/etc/systemd/network/wlan0.network'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 'Configure the .network file for eth0'
+  copy:
+    src: 'eth0.network'
+    dest: '/etc/systemd/network/eth0.network'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 'Check if wpa_supplicant.conf exists'
+  stat:
+    path: '/etc/wpa_supplicant/wpa_supplicant.conf'
+  register: wpa_supplicant_conf
+
+- name: 'Delete /etc/wpa_supplicant/wpa_supplicant.conf'
+  shell: 'rm -v /etc/wpa_supplicant/wpa_supplicant.conf'
+  when: wpa_supplicant_conf.stat.exists
+
+- name: 'Add a wpa_supplicant.conf for the wlan0 interface'
+  copy:
+    src: 'wpa_supplicant-wlan0.conf'
+    dest: '/etc/wpa_supplicant/wpa_supplicant-wlan0.conf'
+    owner: root
+    group: root
+    mode: 0640
+
+- name: 'Disable existing network services'
+  systemd:
+    name: '{{ item }}'
+    enabled: no
+  loop:
+    - 'wpa_supplicant.service'
+    - 'dhcpcd.service'
+
+- name: 'Enabling systemd-networkd'
+  systemd:
+    name: '{{ item }}'
+    enabled: yes
+  loop:
+    - 'systemd-networkd.service'
+    - 'wpa_supplicant@wlan0.service'
+
+- name: 'Enable IPv4 forwarding'
+  sysctl:
+    name: 'net.ipv4.ip_forward'
+    sysctl_file: '/etc/sysctl.d/ipv4.conf'
+    value: '1'
+    state: present
+
+- name: 'Enable IPv6 forwarding'
+  sysctl:
+    name: 'net.ipv6.conf.all.forwarding'
+    sysctl_file: '/etc/sysctl.d/ipv6.conf'
+    value: '1'
+    state: present
+...

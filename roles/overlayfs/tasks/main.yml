@@ -1,0 +1,45 @@
+---
+# Setup a read only system with a tmpfs upper layer using OverlayFS
+
+- name: 'Copy the overlay init script'
+  copy:
+    src: 'overlay.sh'
+    dest: '/etc/initramfs-tools/scripts/overlay'
+    owner: root
+    group: root
+    mode: 0755
+
+- name: 'Add the overlay module to /etc/initramfs-tools/modules'
+  lineinfile:
+    path: '/etc/initramfs-tools/modules'
+    line: 'overlay'
+
+- name: 'Create an initramfs to mount an overlay rootfs'
+  command: '/usr/sbin/update-initramfs -c -k {{ ansible_kernel }}'
+  args:
+    creates: '/boot/initrd.img-{{ ansible_kernel }}'
+
+- name: 'Add the initramfs variable to config.txt'
+  lineinfile:
+    path: '/boot/config.txt'
+    line: 'initramfs initrd.img-{{ ansible_kernel }}'
+
+- name: 'Add a few kernel parameters to /boot/cmdline.txt to enable overlayfs booting'
+  lineinfile:
+    path: '/boot/cmdline.txt'
+    regexp: '^(?!boot=overlay fsck\.mode=skip)(.*)$'
+    backrefs: yes
+    line: 'boot=overlay fsck.mode=skip \1'
+
+- name: 'Disable rootfs in fstab and mount the boot partition in read only mode'
+  lineinfile:
+    path: '/etc/fstab'
+    regexp: '{{ item.regexp }}'
+    backrefs: yes
+    line: '{{ item.line }}'
+  loop:
+    - regexp: '^(?!#.*\s+\/\s+)(.*)(\s+\/\s+)(.*)$'
+      line: '#\1\2\3'
+    - regexp: '^(?!.*\/boot.*defaults,ro)(.*\/boot.*)defaults(.*)$'
+      line: '\1defaults,ro\2'
+...
