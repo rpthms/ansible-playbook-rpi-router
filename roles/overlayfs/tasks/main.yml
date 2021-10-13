@@ -27,9 +27,9 @@
 - name: 'Add a few kernel parameters to /boot/cmdline.txt to enable overlayfs booting'
   lineinfile:
     path: '/boot/cmdline.txt'
-    regexp: '^(?!boot=overlay fsck\.mode=skip net\.ifnames=0)(.*)$'
+    regexp: '^(?!boot=overlay fsck\.mode=skip net\.ifnames=0 systemd\.unified_cgroup_hierarchy=1)(.*)$'
     backrefs: yes
-    line: 'boot=overlay fsck.mode=skip net.ifnames=0 \1'
+    line: 'boot=overlay fsck.mode=skip net.ifnames=0 systemd.unified_cgroup_hierarchy=1 \1'
 
 - name: 'Disable rootfs in fstab and mount the boot partition in read only mode'
   lineinfile:
