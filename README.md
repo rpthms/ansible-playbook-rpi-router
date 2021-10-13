@@ -26,6 +26,9 @@ Need to set the following variables in vars.yml:
 
 ## Instructions
 
+**Make sure to touch /boot/ssh after dd'ing the Raspberry Pi OS image on to your
+SD Card / USB drive.**
+
 This playbook needs to be run in 2 passes. The first pass will setup all the
 necessary packages and services on the Raspberry Pi and the second pass will
 configure the Pi to use overlayfs as the root filesystem
