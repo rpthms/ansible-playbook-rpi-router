@@ -34,6 +34,10 @@
     group: root
     mode: 0640
 
+- name: 'Remove the soft block on WiFi using rfkill'
+  command: 'rfkill unblock wifi'
+  changed_when: 'false'
+
 - name: 'Disable existing network services'
   systemd:
     name: '{{ item }}'
