@@ -29,7 +29,7 @@
     path: '/boot/cmdline.txt'
     regexp: '^(?!boot=overlay fsck\.mode=skip net\.ifnames=0)(.*)$'
     backrefs: yes
-    line: 'boot=overlay fsck.mode=skip net.ifnames=0\1'
+    line: 'boot=overlay fsck.mode=skip net.ifnames=0 \1'
 
 - name: 'Disable rootfs in fstab and mount the boot partition in read only mode'
   lineinfile:
