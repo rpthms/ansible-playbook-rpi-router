@@ -9,6 +9,10 @@ The Pi will be using a read only rootfs with a tmpfs writeable layer on top of
 it using overlayfs. This should help the Pi be much more resistant against SD
 card / USB drive corruption issues.
 
+This playbook needs to be run in 2 passes. The first pass will setup all the
+necessary packages and services on the Raspberry Pi and the second pass will
+configure the Pi to use overlayfs as the root filesystem
+
 Need to set the following variables in vars.yml:
 
 | Variable | Description |
@@ -22,14 +26,40 @@ Need to set the following variables in vars.yml:
 | `host_domain` | Pi's domain name |
 | `time_zone_file` | `Path to the time zone file under /usr/share/zoneinfo` |
 
+## Pass 1
+
+Start the first pass by running `ansible-playbook site-before-reboot.yml`. The
+first pass takes care of the following:
+
+* `apt`: Remove unnecessary packages and upgrade the system
+* `system-config`: Do some basic system configuration like setting the hostname, locale etc.
+* `user-config`: Setup a main user and disable the default 'pi' user
+* `networking`: Configure systemd-networkd and wpa_supplicant
+* `dhcpcd`: Start a DHCP server that listens on the ethernet port
+* `systemd-resolved`: Configure and enable systemd-resolved
+
+Reboot the system after completing Pass 1.
+
+## Pass 2
+
+Start the second pass by running `ansible-playbook site-after-reboot.yml`. The
+first pass takes care of the following:
+
+* `overlayfs`: Use an overlayfs mount for the root filesystem to avoid writes
+on the SD card / USB drive.
+
+Reboot the system after completing Pass 2.
+
 ## After running the playbook
 
-**N.B**: Do these steps before rebooting your Pi, because after rebooting you
-can no longer make changes to any file on the root filesystem. (You'll have to
-load your SD card / USB drive on a PC to make any changes)
+**N.B**: Do these steps before rebooting your Pi after completing Pass 2,
+because after rebooting you can no longer make changes to any files on the root
+filesystem. (You'll have to load your SD card / USB drive on a PC to make any
+changes)
 
 Once the playbook has finished its run, you can do a couple more optional things:
 
-* Uninstall ansible: `apt purge ansible`
+* Uninstall packages that couldn't be uninstalled before: `apt purge ansible git dhcpcd5`
 * Clear out files from `pi`'s home directory
 * Delete all log files from `/var/log`
+* Delete apt package archives and list in `/var/cache/apt/archives` and `/var/lib/apt/lists`

@@ -14,7 +14,5 @@
       tags: 'networking'
     - role: dhcpd
       tags: 'dhcpd'
-    - role: overlayfs
-      tags: 'overlayfs'
     - role: systemd-resolved
       tags: 'systemd-resolved'
