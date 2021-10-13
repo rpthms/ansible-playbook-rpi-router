@@ -12,7 +12,5 @@
       tags: 'user-config'
     - role: networking
       tags: 'networking'
-    - role: dhcpd
-      tags: 'dhcpd'
     - role: systemd-resolved
       tags: 'systemd-resolved'
