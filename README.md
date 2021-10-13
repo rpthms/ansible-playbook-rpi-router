@@ -9,7 +9,7 @@ The Pi will be using a read only rootfs with a tmpfs writeable layer on top of
 it using overlayfs. This should help the Pi be much more resistant against SD
 card / USB drive corruption issues.
 
-This playbook only works with Raspberry Pi OS.
+**This playbook only works with Raspberry Pi OS.**
 
 Need to set the following variables in vars.yml:
 
