@@ -54,7 +54,6 @@ first pass takes care of the following:
 * `system-config`: Do some basic system configuration like setting the hostname, locale etc.
 * `user-config`: Setup a main user and disable the default 'pi' user
 * `networking`: Configure systemd-networkd and wpa_supplicant
-* `dhcpcd`: Start a DHCP server that listens on the ethernet port
 * `systemd-resolved`: Configure and enable systemd-resolved
 
 Reboot the system after completing Pass 1.
@@ -64,6 +63,7 @@ Reboot the system after completing Pass 1.
 Start the second pass by running `ansible-playbook site-after-reboot.yml`. The
 first pass takes care of the following:
 
+* `dhcpcd`: Start a DHCP server that listens on the ethernet port
 * `overlayfs`: Use an overlayfs mount for the root filesystem to avoid writes
 on the SD card / USB drive.
 
