@@ -26,6 +26,8 @@
       - 'man-db'
       - 'dphys-swapfile'
       - 'fake-hwclock'
+      - 'alsa-utils'
+      - 'rng-tools'
     state: absent
     purge: yes
     autoremove: yes
