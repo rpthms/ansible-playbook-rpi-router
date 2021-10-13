@@ -9,10 +9,6 @@ The Pi will be using a read only rootfs with a tmpfs writeable layer on top of
 it using overlayfs. This should help the Pi be much more resistant against SD
 card / USB drive corruption issues.
 
-This playbook needs to be run in 2 passes. The first pass will setup all the
-necessary packages and services on the Raspberry Pi and the second pass will
-configure the Pi to use overlayfs as the root filesystem
-
 Need to set the following variables in vars.yml:
 
 | Variable | Description |
@@ -26,7 +22,25 @@ Need to set the following variables in vars.yml:
 | `host_domain` | Pi's domain name |
 | `time_zone_file` | `Path to the time zone file under /usr/share/zoneinfo` |
 
-## Pass 1
+## Instructions
+
+This playbook needs to be run in 2 passes. The first pass will setup all the
+necessary packages and services on the Raspberry Pi and the second pass will
+configure the Pi to use overlayfs as the root filesystem
+
+Install `ansible` and `git` on your Pi by running:
+
+```
+sudo apt-get install --no-install-recommends --no-install-suggests ansible git
+```
+
+Then download this playbook using git-clone:
+
+```
+git clone https://github.com/rpthms/ansible-playbook-rpi-router.git
+```
+
+### Pass 1
 
 Start the first pass by running `ansible-playbook site-before-reboot.yml`. The
 first pass takes care of the following:
@@ -40,7 +54,7 @@ first pass takes care of the following:
 
 Reboot the system after completing Pass 1.
 
-## Pass 2
+### Pass 2
 
 Start the second pass by running `ansible-playbook site-after-reboot.yml`. The
 first pass takes care of the following:
@@ -50,7 +64,7 @@ on the SD card / USB drive.
 
 Reboot the system after completing Pass 2.
 
-## After running the playbook
+### After running the playbook
 
 **N.B**: Do these steps before rebooting your Pi after completing Pass 2,
 because after rebooting you can no longer make changes to any files on the root
